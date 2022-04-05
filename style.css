@@ -3,9 +3,22 @@
     --thumbHeight:100px;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu&display=swap');
+
 body, html {
     margin:0px;
     padding:0px;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+h3 {
+    font-size:8pt;
+    margin-bottom:0px;
+}
+
+p {
+    margin-top:3px;
+    font-size:8pt;
 }
 
 #container {
@@ -22,15 +35,50 @@ body, html {
 }
 
 #left {
-    background-color:lightcoral;
+    /* background-color:lightcoral; */
     display:flex;
     flex:1;
     padding:10px;
+    border-right: 1px solid black;
 }
 
 #right {
-    background-color:lightgreen;
+    background-image: radial-gradient(currentColor 1px, transparent 1px);
+    background-size: calc(10 * 1px) calc(10 * 1px);
+    /* background-color:#35DB92 !important; */
+    color: #D0DCE7 !important;
+    
     width:400px;
+}
+
+#right-container {
+    /* border: solid 1px black; */
+    display:flex;
+    align-items:center;
+    /* justify-content: center; */
+    padding-top:50px;
+    height:100%;
+    flex-direction:column;
+}
+
+#img-props {
+    width:100%;
+    box-sizing:border-box;
+    padding:10px;
+    background-color:lightgoldenrodyellow;
+    margin: 30px;
+    padding:20px;
+    color:black;
+}
+
+.img-prop {
+    width:100%;
+    word-wrap:break-word;
+}
+
+#konva-container {
+    display:inline-block;
+    border: 2px solid black;
 }
 
 #image-results {
