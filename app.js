@@ -379,7 +379,7 @@ function updateText(pix) {
   }
 
   /**
-   * 
+   * Creates and updates properties 
    * @param {String} imgURL URL to the Image
    * @param {String} imgH Height of large image
    * @param {String} imgW Width of large image
