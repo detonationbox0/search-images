@@ -365,8 +365,10 @@ $(document).on("click", ".thumbs", function() {
 
 
 function updateText(img) {
+    console.log(img)
+    var url =img.attrs.image.currentSrc; 
     var lines = [
-      'url: ' + img.src(),
+      'url: ' + img.attrs.image.currentSrc,
       'x: ' + img.x(),
       'y: ' + img.y(),
       'rotation: ' + img.rotation(),
@@ -375,6 +377,7 @@ function updateText(img) {
       'scaleX: ' + img.scaleX(),
       'scaleY: ' + img.scaleY(),
     ];
+    $("#svg-link").attr("href", )
     $("#img-props").text(lines.join('\n'));
 }
 
