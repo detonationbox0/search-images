@@ -240,9 +240,9 @@ $("#go").on("click", function() {
             result.hits.forEach(function(hit) {
                 
                 // If the image is an SVG
-                // if (!hit.type.includes("svg")) {
-                //     return;
-                // }
+                if (!hit.type.includes("svg")) {
+                    return;
+                }
                 
                 // Make DOM object
                 var domElem = `
@@ -368,11 +368,19 @@ function updateText(pix) {
     //   'scaleY: ' + img.scaleY(),
     // ]
 
+    var curWidth = pix.width() * pix.scaleY();
+    var curHeight = pix.height() * pix.scaleX();
 
-    $("#imgWS").text(`${pix.width() * pix.scaleY()}`)
+    var targetWidth = 4500;
+    var targetHeight = 6000;
+
+    $("#imgWS").text(`${pix.width() * pix.scaleY()}`);
     $("#imgHS").text(`${pix.height() * pix.scaleX()}`);
 
 
+
+
+    
 
 
 
