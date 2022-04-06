@@ -63,6 +63,7 @@ p {
 
 #img-props {
     width:100%;
+    display:block;
     box-sizing:border-box;
     padding:10px;
     background-color:lightgoldenrodyellow;

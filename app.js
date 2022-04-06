@@ -247,7 +247,7 @@ $("#go").on("click", function() {
                 // Make DOM object
                 var domElem = `
 <div class="thumbs">
-    <img class="thumb-img" src="${hit.previewURL}" url="${hit.largeImageURL}" props="w=${hit.imageWidth}&h=${hit.imageHeight}" />
+    <img class="thumb-img" src="${hit.previewURL}" url="${hit.largeImageURL}" props="w=${hit.imageWidth}&h=${hit.imageHeight}" svg="${hit.vectorURL}" />
 </div>
                 `
                 // Add to DOM
@@ -272,7 +272,7 @@ $("#go").on("click", function() {
  */
 $(document).on("click", ".thumbs", function() {
     //#region
-    var imgURL = $(this).find("img").attr("url");
+    var imgURL = $(this).find("img").attr("svg");
 
     var props = $(this).find("img").attr("props");
 
@@ -284,146 +284,126 @@ $(document).on("click", ".thumbs", function() {
     var imgWS = Number(imgW * scale);
     var imgHS = Number(imgH * scale);
 
-    // $("")
 
-
-    // Calculate PPI
-
-    var rW = 15;
-    var rH = 20;
-
-    var ppi = calculatePPI(rW, rH, imgW, imgH);
-
-    console.log(ppi);
-
-    writeData(imgURL, imgH, imgW, imgHS, imgWS, ppi)
-
-    var img = Konva.Image.fromURL(imgURL, function (pix) {
-        pix.setAttrs({
-            x: 0,
-            y: 0,
-            scaleX: scale,
-            scaleY: scale,
-            draggable: true,
+    // try to draw SVG natively
+    // Doesn't work with some SVGs on Firefox!
+    // See https://github.com/konvajs/konva/issues/677
+    Konva.Image.fromURL(imgURL, (imageNode) => {
+        imageNode.setAttrs({
+            width: imgWS,
+            height: imgHS,
+            draggable:true,
             name:"selectable"
         });
-        layer.add(pix);
 
-        tr.nodes([pix]);
+        layer.add(imageNode);
+        imageNode.moveToTop();
 
-        pix.on("transform", function() {
-            updateText(pix);
-            // console.log('transform');
-        })
+        // Add the image to the Transformer
+        tr.nodes([imageNode])
+        
+        imageNode.on('dragmove', function () {
+            updateText(imageNode);
+        });
+        imageNode.on('transform', function () {
+            updateText(imageNode);
+            console.log('transform');
+        });
 
     });
 
+    // This is apparently a fix for Firefox
+    // but I could not get it to work.
+    // https://github.com/konvajs/konva/issues/677 
+    // You may need to use a CORS Proxy
+    // $.get(imgURL, function( data ) {
+    //     var xmlSerializer = new XMLSerializer(),
+    //         svgDOM = data;
 
-    /**
-     * When the user resizes the image...
-     * https://konvajs.org/docs/select_and_transform/Transform_Events.html
-     */
+    //     console.log(`Width: ${imgW} Height: ${imgH}`)
+
+    //     // var imageObj = new Image();
+    //     // imageObj.onload = function() {
+    //     var image = new Konva.Image({
+    //         x: 0,
+    //         y: 0,
+    //         // image: imageObj,
+    //         // scaleX:.2,
+    //         // scaleY:.2,
+    //         width: 50,
+    //         height: 50,
+    //         draggable:true,
+    //         name:"selectable" 
+    //     });
+    //     // };
+    //     // var attrs = {
+    //     //     width: size,
+    //     //     height: size,
+    //     //     viewBox: "0 0 24 24",
+    //     //     fill: 'red'
+    //     // };
+    //     // Object.keys(attrs).forEach(function (key) {
+    //     // return svgDOM.documentElement.setAttribute(key, attrs[key]);
+    //     // });
+    //     var customSVG = xmlSerializer.serializeToString(svgDOM);
+    //     var blob = new Blob([customSVG], {type: 'image/svg+xml'});
+    //     var url = URL.createObjectURL(blob);
+    //     console.log(url);
+    //     image.src = url;
+    //     layer.add(image);
+    //     layer.draw();
+    // });
+
+
+
+
+
 
 
 //#endregion
 });
 
-/**
- * Calculate the PPI based on target dimensions
- * @param {Number} w Width in Inches
- * @param {Number} h Height in Inches
- * @param {Number} pw Width in Pixels
- * @param {Number} ph Height in Pixels
- * @returns PPI
- */
 
-function calculatePPI (w, h, pw, ph) {
-    //#region
-
-    // PPI formula
-    // diagonal = √ (width² + height²) 
-    // ppi = diagonal in pixels / diagonal in inches
-
-    var dp = Math.sqrt(Math.pow(pw, 2) + Math.pow(ph, 2));
-    var di = Math.sqrt(Math.pow(w, 2) + Math.pow(h, 2));
-
-    var ppi = dp / di;
-
-    return ppi;
-    //#endregion
+function updateText(img) {
+    var lines = [
+      'x: ' + img.x(),
+      'y: ' + img.y(),
+      'rotation: ' + img.rotation(),
+      'width: ' + img.width(),
+      'height: ' + img.height(),
+      'scaleX: ' + img.scaleX(),
+      'scaleY: ' + img.scaleY(),
+    ];
+    $("#img-props").text(lines.join('\n'));
 }
 
-/**
- * Updates the image properties in DOM
- * @param {Konva Image()} pix Image to read the properties from
- */
-function updateText(pix) {
-    // var lines = [
-    //   'x: ' + img.x(),
-    //   'y: ' + img.y(),
-    //   'rotation: ' + img.rotation(),
-    //   'width: ' + img.width(),
-    //   'height: ' + img.height(),
-    //   'scaleX: ' + img.scaleX(),
-    //   'scaleY: ' + img.scaleY(),
-    // ]
+// /**
+//  * Calculate the PPI based on target dimensions
+//  * @param {Number} w Width in Inches
+//  * @param {Number} h Height in Inches
+//  * @param {Number} pw Width in Pixels
+//  * @param {Number} ph Height in Pixels
+//  * @returns PPI
+//  */
 
-    var curWidth = pix.width() * pix.scaleY();
-    var curHeight = pix.height() * pix.scaleX();
+// function calculatePPI (w, h, pw, ph) {
+//     //#region
 
-    var targetWidth = 4500;
-    var targetHeight = 6000;
+//     // PPI formula
+//     // diagonal = √ (width² + height²) 
+//     // ppi = diagonal in pixels / diagonal in inches
 
-    $("#imgWS").text(`${pix.width() * pix.scaleY()}`);
-    $("#imgHS").text(`${pix.height() * pix.scaleX()}`);
+//     var dp = Math.sqrt(Math.pow(pw, 2) + Math.pow(ph, 2));
+//     var di = Math.sqrt(Math.pow(w, 2) + Math.pow(h, 2));
 
+//     var ppi = dp / di;
 
-
-
-    
+//     return ppi;
+//     //#endregion
+// }
 
 
 
-  }
-
-  /**
-   * Creates and updates properties 
-   * @param {String} imgURL URL to the Image
-   * @param {String} imgH Height of large image
-   * @param {String} imgW Width of large image
-   * @param {String} imgHS Current Height of image
-   * @param {String} imgWS Current Width of image
-   * @param {String} ppi PPI
-   */
-  
-  function writeData(imgURL, imgH, imgW, imgHS, imgWS, ppi) {
-      $("#img-props").empty().append(`
-      <div id="img-url" class="img-prop">
-        <h3>Image URL</h3>
-        <p class="prop" id="imgURL">${imgURL}</p>
-      </div>
-      <div id="img-og-height" class="img-prop">
-        <h3>Original Image Height</h3>
-        <p class="prop" id="imgH">${imgH}</p>
-      </div>
-      <div id="img-og-width" class="img-prop">
-        <h3>Original Image Width</h3>
-        <p class="prop" id="imgW">${imgW}</p>
-      </div> 
-      <div id="img-height" class="img-prop">
-        <h3>Current Image Height</h3>
-        <p class="prop" id="imgHS">${imgHS}</p>
-      </div>
-      <div id="img-width" class="img-prop">
-        <h3>Current Image Width</h3>
-        <p class="prop" id="imgWS">${imgWS}</p>
-      </div>
-      <div id="img-ppi" class="img-prop">
-        <h3>Effective PPI</h3>
-        <p class="prop" id="ppi">${ppi}</p>
-      </div>
-      `)
-  }
 
 
   $("#download").on("click", function() {
@@ -483,3 +463,20 @@ function downloadURI(uri, name) {
     link.remove();
     //#endregion
   }
+
+  /**
+   * User presses enter, search
+   */
+  // Get the input field
+var input = document.getElementById("image-search");
+
+// Execute a function when the user releases a key on the keyboard
+input.addEventListener("keyup", function(event) {
+  // Number 13 is the "Enter" key on the keyboard
+  if (event.keyCode === 13) {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Trigger the button element with a click
+    document.getElementById("go").click();
+  }
+});
