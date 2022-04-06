@@ -366,6 +366,7 @@ $(document).on("click", ".thumbs", function() {
 
 function updateText(img) {
     var lines = [
+      'url: ' + img.src(),
       'x: ' + img.x(),
       'y: ' + img.y(),
       'rotation: ' + img.rotation(),
