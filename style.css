@@ -65,6 +65,9 @@ p {
     width:100%;
     display:block;
     box-sizing:border-box;
+    word-wrap: break-word;
+    overflow-x: auto;
+    white-space: pre-wrap;
     padding:10px;
     background-color:lightgoldenrodyellow;
     margin: 30px;
